@@ -1,0 +1,502 @@
+
+################ CREATE ENV
+python3 -m venv .venv
+source .venv/bin/activate
+
+################ READ ME 
+# at this point it shoudl ask to auto activate each time, if it doesnt you need to setup a 
+".vscode" folder with a debugger launch.json file
+
+################
+
+
+
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+ >>>>>>>SAVE AS "launch.json" in the ".../github/mainpackage_name/.vscode/launch.json<<<<<<<<
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Current Notebook",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/${relativeFile}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
+
+
+################ UPDATE TOOLS
+
+pip3 install --upgrade pip
+pip3 install --upgrade setuptools
+
+
+################ SETUP PACKAGE FOR DEVELOPMENT
+
+pip3 install -e .
+
+################
+
+
+
+
+
+
+
+NOTE FOR UPDATEING LIVE IN CELL BLOCKS USE THIS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+import importlib
+
+def reload_imports(package_name, module_names):
+    """
+    Reload specified modules from a given package.
+
+    Parameters:
+    - package_name: str, name of the package (e.g., 'automethylML')
+    - module_names: list of str, names of the modules to reload (e.g., ['RScriptRunner', 'WorkflowHelper', 'utils'])
+    """
+    reloaded_modules = {}
+    
+    for module_name in module_names:
+        full_module_name = f"{package_name}.{module_name}"
+        module = importlib.import_module(full_module_name)
+        importlib.reload(module)
+        reloaded_modules[module_name] = module
+    
+    # Update globals with the reloaded modules
+    globals().update(reloaded_modules)
+
+# Example usage:
+# reload_imports('automethylML', ['RScriptRunner', 'WorkflowHelper', 'utils'])
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
+
+
+
+
+
+################
+
+
+pip3 install ipykernel
+pip3 install notebook
+pip3 install jupyterlab
+
+pip3 install ipywidgets
+
+
+pip3 install jupyter_contrib_nbextensions
+
+
+python3 -m ipykernel install --user --name=.venv --display-name "Python (.venv)"
+
+
+################ READ ME 
+make sure ot set the default python environment
+
+################
+
+
+################################################################################        jupyter contrib nbextension install --user
+################################################################################        jupyter nbextension enable --py widgetsnbextension
+
+################ REQUIREMENTS
+
+
+pip3 install -r requirements.txt
+
+################ COMMON 
+
+
+pip3 install numpy
+pip3 install pandas
+pip3 install tqdm
+pip3 install matplotlib
+pip3 install seaborn
+pip3 install scikit-learn
+pip3 install joblib
+pip3 install natsort
+
+
+################ less common
+
+
+pip3 install pytz
+pip3 install pyarrow
+pip3 install shap
+pip3 install optuna
+
+
+################ dot ENV 
+
+pip3 install python-dotenv
+touch .env
+
+
+
+
+
+## EXAMPLE ##
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+>>>> save to .env file 
+SECRET_KEY=mysecretkey
+DATABASE_URL=postgres://user:password@localhost:5432/mydatabase
+
+
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables
+secret_key = os.getenv('SECRET_KEY')
+database_url = os.getenv('DATABASE_URL')
+
+print("Secret Key:", secret_key)
+print("Database URL:", database_url)
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+
+
+
+
+
+
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+################
+
+
+
+____Pip install current package to reflect edits immediately _____
+
+Navigate to your package and use…
+pip install -e .
+
+
+__QUICK NOTES__
+
+File>> open folder 
+Terminal>> new terminal 
+____ ____ ____ ____ ____ ____
+sudo apt-get update
+
+python3 -m venv .venv
+source .venv/bin/activate
+
+
+pip install --upgrade pip
+
+pip install --upgrade setuptools
+
+
+
+____ ____ ____ ____ ____ ____
+local package to allow you to import and use it directly 
+
+
+pip install -e . 
+
+
+____ ____ ____ ____ ____ ____
+
+
+setting up code runner to use virtual environment 
+see this link
+
+
+Go to VS Code settings (File -> Preferences -> Settings or Cmd/Ctrl + ,).
+In the top right corner of the settings tab, you'll see an {} icon which stands for "Edit in settings.json". Click on it.
+Add or update the code-runner.executorMap setting to:
+
+SEARCH FOR "code-runner.executorMap"
+in settings, there will  be many settings just search for python and replace as follows 
+
+"code-runner.executorMap": {
+...
+...
+...
+
+
+        // "python": "python -u",
+        "python": "\"$pythonPath\" $fullFileName"
+...
+...
+...
+}
+____ ____ ____ ____ ____ ____
+
+enable tqdm to work in jupyter notebook, run the following in terminal venv then launch new kernel for jupyter notebook (i.e. "jupyter notebook" from terminal). 
+
+
+jupyter nbextension enable --py widgetsnbextension
+
+____ ____ ____ ____ ____ ____
+DEBUGGING 
+
+https://stackoverflow.com/questions/42609943/what-is-the-use-case-for-pip-install-e
+
+once you have a setup.py file in root directory you can use this command to install package that automatically updates as you use it. this allows you to directly debug the code using hte debugger!!!!
+
+
+pip install -e . 
+
+
+
+
+____ ____ ____ ____ ____ ____
+
+
+SETTING AUTO ACTIVATE VENV 
+https://stackoverflow.com/questions/58433333/auto-activate-virtual-environment-in-visual-studio-code
+
+This is how I did it in 2021:
+
+Enter Ctrl+Shift+P in your vs code.
+
+Locate your Virtual Environment:
+
+Python: select interpreter > Enter interpreter path > Find
+
+Once you locate your virtual env select your python version:
+
+your-virtual-env > bin > python3.
+
+Now in your project you will see .vscode directory created open settings.json inside of it and add:
+
+"python.terminal.activateEnvironment": true
+
+don't forget to add comma before to separate it with already present key value pair.
+
+Now restart the terminal.
+
+You should see your virtual environment activated automatically.
+
+
+
+
+
+
+--auto open terminal in venv setting--
+"python.terminal.activateEnvInCurrentTerminal": true
+
+____ ____ ____ ____ ____ ____
+____ ____ ____ ____ ____ ____
+____ ____ ____ ____ ____ ____
+if you need to, install pipreqs, on your default python terminal 
+pip install pipreqs
+then CD to your root directory 
+then run (use --force to force overwrite) 
+pipreqs .
+
+Note this is just a quick initial fix and version issues may need to be considered later. 
+run unit tests if they exist. 
+
+
+pip3 install -r pip_start.txt # generic packages to quickly get started on a project
+OR 
+pip3 install -r requirements.txt
+
+pip install pipreqs # should already be installed on my mac 
+#then
+pipreqs path/to/project
+
+
+for example 
+
+(base) phil@Phillips-MacBook-Pro ~ % pipreqs /Users/phil/Dropbox/GITHUB/nillip/nillip
+INFO: Successfully saved requirements file in /Users/phil/Dropbox/GITHUB/nillip/nillip/requirements.txt
+
+now move it to the root folder /Users/phil/Dropbox/GITHUB/nillip/
+
+
+__JUPYTER__
+Must install ipython (see in pip_start.txt file) (ipykernel)
+https://stackoverflow.com/questions/58119823/jupyter-notebooks-in-visual-studio-code-does-not-use-the-active-virtual-environm
+
+STEP 1
+pip install ipykernel
+
+pip install notebook
+
+
+You must RESTART VS Code after you pip install, specifically for 'ipykernel'. 
+But just always do it to be safe. 
+ALSO leave 'user' as 'user' and just change the project name 
+
+
+STEP 2
+Then use 
+ipython kernel install --user --name=EXAMPLE_PROJECT_NAME
+E.G. >>>ipython kernel install --user --name=notebook_poc
+
+
+Where EXAMPLE_PROJECT_NAME is what you want to name it so make it match the name of your project 
+folder to stay organized. Note this is just a name and it will run whatever virtual 
+environment you run that line from. 
+
+This installs the venv onto jupyter, then you can type 
+jupyter notebook
+Then select the environment you want to use with when creating a new .ipynb file. 
+
+
+
+
+UNINSTALL jupyter VENV
+
+From a given venv type
+jupyter kernelspec uninstall EXAMPLE_PROJECT_NAME
+
+
+__PYTORCH__
+Systems require different versions go here to check out what to download 
+https://pytorch.org/get-started/locally/
+For my MBP 2015 it is 
+pip3 install torch torchvision torchaudio
+
+
+
+__MISC__
+
+
+set python default in mac 
+
+echo "alias python='/usr/local/bin/python3'" >> ~/.zshrc
+source ~/.zshrc
+
+
+
+____ ____ ____ ____ ____ ____
+
+input doesnt stop in vscode 
+https://stackoverflow.com/questions/69186311/python-input-function-not-working-in-vs-code
+
+Code Runner shows results in OUTPUT and doesn't accept inputs by default. Add
+
+"code-runner.runInTerminal": true
+in Settings.json, then you can input data.
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+____ ____ ____ ____ ____ ____
+
+
+
+
+
