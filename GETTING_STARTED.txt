@@ -12,6 +12,77 @@ source .venv/bin/activate
 
 
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@      METAFLOW      @@@@@@@@@@@@@@@@@@@@@@@@@@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+## make sure these are installed outside your venv 
+
+brew install yarn
+brew install node
+
+
+
+### inside venv install these 
+
+pip install metaflow
+
+
+git clone https://github.com/Netflix/metaflow-service.git
+git clone https://github.com/Netflix/metaflow-ui.git
+
+
+
+cd metaflow-service
+yarn
+
+
+then run ############
+docker build --progress=plain --platform linux/arm64 -f Dockerfile.metadata_service -t metadata .
+
+
+
+############ get around SSL issue you can add this to the top of Dockerfile.ui_service 
+
+# Disable SSL verification for curl
+RUN echo "insecure" > ~/.curlrc
+
+# Disable SSL verification for git
+RUN git config --global http.sslVerify false
+
+then run ############
+docker build --progress=plain --platform linux/arm64 -f Dockerfile.ui_service -t ui_backend .
+
+
+
+############ get around SSL issue you can add this to the top of Dockerfile.migration_service 
+
+
+git clone --branch v3.9.0 https://github.com/pressly/goose.git
+
+
+docker build --progress=plain --platform linux/arm64 -f Dockerfile.migration_service -t migration .
+
+
+then run ############
+docker-compose -f docker-compose.development.yml up
+
+
+
+
+
+
+
+
+## make sure to go back cd .. or new terminal 
+cd metaflow-ui
+yarn
+
+
+cd metaflow-service
+docker-compose -f docker-compose.development.yml up
+
+
+METAFLOW_SERVICE_PROXY=http://localhost:8083 yarn start
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -115,6 +186,11 @@ pip3 install ipywidgets
 
 pip3 install jupyter_contrib_nbextensions
 
+pip install mrx-link-core mrx-link-git mrx-link
+
+
+#### LAUNCH IT FROM HERE TO ENSURE IT RUNS WITH CERTIAN PYTHON VERISON !!!!!
+/.venv/bin/jupyter-lab
 
 python3 -m ipykernel install --user --name=.venv --display-name "Python (.venv)"
 

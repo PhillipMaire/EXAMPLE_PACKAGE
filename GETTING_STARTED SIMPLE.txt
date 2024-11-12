@@ -1,0 +1,20 @@
+/opt/homebrew/opt/python@3.10/bin/python3.10 -m venv .venv
+source .venv/bin/activate
+
+
+pip install --upgrade pip
+pip install --upgrade setuptools
+
+pip install  mrx-link
+
+pip install ipykernel notebook jupyterlab
+
+
+jupyter kernelspec uninstall recover_project_test_3
+
+python -m ipykernel install --user --name=.venv --display-name "recover_project_test_3"
+
+jupyter lab extension list
+jupyter extension list
+
+jupyter lab
