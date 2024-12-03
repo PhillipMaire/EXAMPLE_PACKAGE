@@ -1,5 +1,10 @@
 
-################ CREATE ENV
+################ CREATE ENV specific version 
+brew install python@3.10
+/opt/homebrew/opt/python@3.10/bin/python3.10 -m venv .venv
+source .venv/bin/activate
+
+################ CREATE ENV default
 python3 -m venv .venv
 source .venv/bin/activate
 
