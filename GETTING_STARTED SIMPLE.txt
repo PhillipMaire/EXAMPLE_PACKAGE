@@ -1,3 +1,6 @@
+brew install python@3.10
+
+
 /opt/homebrew/opt/python@3.10/bin/python3.10 -m venv .venv
 source .venv/bin/activate
 
