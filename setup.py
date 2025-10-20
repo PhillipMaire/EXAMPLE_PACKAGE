@@ -1,6 +1,6 @@
 
 from setuptools import setup, find_packages
-pakage_name = 'example_package'
+pakage_name = 'snippetropolis'
 setup(
     name=pakage_name,
     version='0.1.0',

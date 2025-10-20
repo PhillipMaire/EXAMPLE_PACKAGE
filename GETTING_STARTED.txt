@@ -1,3 +1,4 @@
+ls -l /opt/homebrew/Cellar/python@*
 
 ################ CREATE ENV specific version 
 brew install python@3.10
@@ -24,6 +25,8 @@ source .venv/bin/activate
 
 brew install yarn
 brew install node
+brew install postgresql
+
 
 
 
