@@ -3,6 +3,9 @@
 # Linux Server Setup Script (Bash-only)
 # Automates setup of a new Linux server environment and adds a 'venva' alias.
 
+# chmod +x setup_runpod.sh
+# ./setup_runpod.sh
+
 set -e  # Exit immediately if a command exits with a non-zero status
 
 echo "Starting Linux server setup..."
@@ -78,15 +81,37 @@ git config --global user.email "$email"
 
 # Prompt for GitHub setup
 echo ""
-read -p "Do you want to set up GitHub authentication and clone the gradient-routing repository? (y/n): " -n 1 -r
+read -p "Do you want to set up GitHub authentication and clone a repository? (y/n): " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   echo "Starting GitHub authentication..."
   gh auth login
 
-  echo "Cloning gradient-routing repository..."
-  git clone https://github.com/agencyenterprise/gradient-routing
+  read -p "Enter the repository URL to clone: " repo_url
+  if [ -n "$repo_url" ]; then
+    echo "Cloning repository from $repo_url..."
+    git clone "$repo_url"
+    echo "Repository cloned successfully!"
+
+    read -p "Do you want to create a Python virtual environment in the new repository? (y/n): " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        repo_name=$(basename -s .git "$repo_url")
+        if [ -d "$repo_name" ]; then
+            cd "$repo_name"
+            echo "Creating virtual environment in $(pwd)..."
+            # Assumes uv is on the PATH after installation earlier in this script
+            uv venv
+            echo "Virtual environment created. Activate it with 'source .venv/bin/activate' or the 'venva' alias."
+            cd .. # Go back to workspace dir
+        else
+            echo "Could not find repository directory '$repo_name'. Skipping venv creation."
+        fi
+    fi
+  else
+    echo "No repository URL entered. Skipping cloning."
+  fi
 
   echo "GitHub setup completed!"
 else
