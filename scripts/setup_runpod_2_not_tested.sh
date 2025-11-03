@@ -1,0 +1,151 @@
+#!/bin/bash
+
+# Linux Server Setup Script (Bash-only)
+# Automates setup of a new Linux server environment and adds a 'venva' alias.
+
+# chmod +x setup_runpod.sh
+# ./setup_runpod.sh
+
+set -e  # Exit immediately if a command exits with a non-zero status
+
+echo "Starting Linux server setup..."
+
+# Change to workspace directory
+echo "Changing to /workspace directory..."
+cd /workspace
+
+# Update package lists
+echo "Updating package lists..."
+apt update
+
+# Install uv (Python package manager)
+echo "Installing uv..."
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Load environment (uv installer sets this)
+if [ -f "$HOME/.local/bin/env" ]; then
+  # shellcheck disable=SC1090
+  source "$HOME/.local/bin/env"
+fi
+
+# Install sudo
+echo "Installing sudo..."
+apt install sudo -y
+
+# Update package lists with sudo
+echo "Updating package lists with sudo..."
+sudo apt update
+
+# Install tmux
+echo "Installing tmux..."
+sudo apt install tmux -y
+
+# Install GitHub CLI
+echo "Installing GitHub CLI..."
+(type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
+  && sudo mkdir -p -m 755 /etc/apt/keyrings \
+  && out=$(mktemp) && wget -nv -O"$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+  && cat "$out" | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+  && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+  && sudo apt update \
+  && sudo apt install gh -y
+
+# Add environment variable to .bashrc (idempotent)
+echo "Setting up environment variables..."
+if ! grep -q 'XDG_CACHE_HOME="/workspace/.cache"' "$HOME/.bashrc" 2>/dev/null; then
+  cat >> "$HOME/.bashrc" << 'EOF'
+export XDG_CACHE_HOME="/workspace/.cache"
+EOF
+fi
+
+# --- Add 'venva' alias (CURRENT DIRECTORY ONLY, Bash) ---
+echo "Installing 'venva' alias for Bash (current directory only)..."
+if ! grep -q '>>> venva helper (current dir) >>>' "$HOME/.bashrc" 2>/dev/null; then
+  cat >> "$HOME/.bashrc" << 'EOF'
+# >>> venva helper (current dir) >>>
+# Activate ./.venv if present in the CURRENT directory only
+alias venva='[ -f .venv/bin/activate ] && . ".venv/bin/activate" || echo "venva: no .venv/bin/activate in this directory"'
+# <<< venva helper (current dir) <<<
+EOF
+fi
+
+# --- Add automatic venv activation ---
+echo "Installing automatic venv activation for Bash..."
+if ! grep -q '>>> auto-venv activation >>>' "$HOME/.bashrc" 2>/dev/null; then
+  cat >> "$HOME/.bashrc" << 'EOF'
+
+# >>> auto-venv activation >>>
+# Automatically activate a .venv if it exists in the current directory
+# when the prompt is displayed.
+# Also, keep track of the activated venv path to avoid re-activating.
+_prompt_venv_activate() {
+    # If we are in a venv
+    if [ -n "$VIRTUAL_ENV" ]; then
+        # If the venv is for the current directory, do nothing
+        if [ "$VIRTUAL_ENV" = "$(pwd)/.venv" ]; then
+            return
+        fi
+    fi
+
+    # If there is an activate script in the current dir, activate it
+    if [ -f "$(pwd)/.venv/bin/activate" ]; then
+        source "$(pwd)/.venv/bin/activate"
+    fi
+}
+
+# Run the activation function before displaying the prompt
+PROMPT_COMMAND="_prompt_venv_activate; $PROMPT_COMMAND"
+# <<< auto-venv activation <<<
+EOF
+fi
+
+# Apply to current session (Bash)
+# shellcheck disable=SC1090
+source "$HOME/.bashrc"
+
+# Git identity
+read -p "Enter your name for git: " username
+read -p "Enter your email for git: " email
+git config --global user.name "$username"
+git config --global user.email "$email"
+
+# Prompt for GitHub setup
+echo ""
+read -p "Do you want to set up GitHub authentication and clone a repository? (y/n): " -n 1 -r
+echo ""
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  echo "Starting GitHub authentication..."
+  gh auth login
+
+  read -p "Enter the repository URL to clone: " repo_url
+  if [ -n "$repo_url" ]; then
+    echo "Cloning repository from $repo_url..."
+    git clone "$repo_url"
+    echo "Repository cloned successfully!"
+
+    read -p "Do you want to create a Python virtual environment in the new repository? (y/n): " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        repo_name=$(basename -s .git "$repo_url")
+        if [ -d "$repo_name" ]; then
+            cd "$repo_name"
+            echo "Creating virtual environment in $(pwd)..."
+            # Assumes uv is on the PATH after installation earlier in this script
+            uv venv
+            echo "Virtual environment created. Activate it with 'source .venv/bin/activate' or the 'venva' alias."
+            cd .. # Go back to workspace dir
+        else
+            echo "Could not find repository directory '$repo_name'. Skipping venv creation."
+        fi
+    fi
+  else
+    echo "No repository URL entered. Skipping cloning."
+  fi
+
+  echo "GitHub setup completed!"
+else
+  echo "Skipping GitHub setup."
+fi
+
+echo "Server setup completed successfully!"
