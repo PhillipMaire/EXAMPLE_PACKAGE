@@ -1,0 +1,12 @@
+# make sure python3.12 and venv are installed
+sudo apt update
+sudo apt install python3.12 python3.12-venv -y
+
+# create venv
+python3.12 -m venv .venv
+
+# activate
+source .venv/bin/activate
+
+# upgrade pip
+pip install --upgrade pip
